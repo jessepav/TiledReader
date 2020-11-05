@@ -81,7 +81,11 @@ public class ArrayTileLayer extends TiledTileLayer {
             advance();
             return next;
         }
-        
+
+        @Override
+        public void remove() {
+            throw new UnsupportedOperationException();
+        }
     }
     
     private class TileLocationsSet extends AbstractSet<Point> {

@@ -73,17 +73,29 @@ public class HashTileLayer extends TiledTileLayer {
     
     @Override
     public final boolean getTileHorizontalFlip(int x, int y) {
-        return ((flags.getOrDefault(new Point(x, y), 0) & FL_FLIPX) != 0);
+        Integer f = flags.get(new Point(x, y));
+        if (f == null)
+            return false;
+        else
+            return (f & FL_FLIPX) != 0;
     }
     
     @Override
     public final boolean getTileVerticalFlip(int x, int y) {
-        return ((flags.getOrDefault(new Point(x, y), 0) & FL_FLIPY) != 0);
+        Integer f = flags.get(new Point(x, y));
+        if (f == null)
+            return false;
+        else
+            return (f & FL_FLIPY) != 0;
     }
     
     @Override
     public final boolean getTileDiagonalFlip(int x, int y) {
-        return ((flags.getOrDefault(new Point(x, y), 0) & FL_FLIPD) != 0);
+        Integer f = flags.get(new Point(x, y));
+        if (f == null)
+            return false;
+        else
+            return (f & FL_FLIPD) != 0;
     }
     
 }

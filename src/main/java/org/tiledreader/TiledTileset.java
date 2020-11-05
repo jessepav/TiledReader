@@ -85,11 +85,11 @@ public class TiledTileset extends TiledResource implements TiledCustomizable {
         this.gridHeight = gridHeight;
         this.image = image;
         this.terrainTypes = (terrainTypes == null ?
-                Collections.emptyList() : Collections.unmodifiableList(terrainTypes));
+                Collections.<TiledTerrainType>emptyList() : Collections.unmodifiableList(terrainTypes));
         this.wangSets = (wangSets == null ?
-                Collections.emptyList() : Collections.unmodifiableList(wangSets));
+                Collections.<TiledWangSet>emptyList() : Collections.unmodifiableList(wangSets));
         this.properties = (properties == null ?
-                Collections.emptyMap() : Collections.unmodifiableMap(properties));
+                Collections.<String,Object>emptyMap() : Collections.unmodifiableMap(properties));
     }
     
     /**

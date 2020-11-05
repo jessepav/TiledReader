@@ -73,7 +73,7 @@ public class TiledMap extends TiledResource implements TiledCustomizable {
         this.topLevelLayers = Collections.unmodifiableList(topLevelLayers);
         this.nonGroupLayers = Collections.unmodifiableList(nonGroupLayers);
         this.properties = (properties == null ?
-                Collections.emptyMap() : Collections.unmodifiableMap(properties));
+                Collections.<String,Object>emptyMap() : Collections.<String,Object>unmodifiableMap(properties));
     }
     
     /**

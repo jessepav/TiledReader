@@ -1,5 +1,7 @@
 package org.tiledreader;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.awt.Color;
 import java.awt.Point;
 import java.awt.geom.Point2D;
@@ -11,7 +13,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Base64;
+import org.apache.commons.codec.binary.Base64;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -388,7 +390,7 @@ public abstract class TiledReader {
     private static final int FL_TILE_FLIPD = 0x20000000;
     private static final int FL_TILE_ALL = FL_TILE_FLIPX | FL_TILE_FLIPY | FL_TILE_FLIPD;
     
-    private static final Base64.Decoder BASE_64_DECODER = Base64.getDecoder();
+    private static final Base64 BASE_64_DECODER = new Base64();
     
     /**
      * The logger for the TiledReader library.
@@ -1019,7 +1021,8 @@ public abstract class TiledReader {
             throws XMLStreamException {
         return parseBooleanFromInt(reader, attribute, value, false, false);
     }
-    
+
+    @SuppressWarnings("unchecked")
     private <E extends Enum<E>> E parseEnumValue(Class<E> cls, XMLStreamReader reader,
             String attribute, String value, boolean useDefault, E default_) throws XMLStreamException {
         if (value == null) {
@@ -1040,7 +1043,7 @@ public abstract class TiledReader {
                 throw new RuntimeException(e2);
             }
             throwInvalidValueException(reader, attribute, value,
-                    "value must be one of the following: " + String.join(", ", enumValues));
+                    "value must be one of the following: " + StringUtils.join(enumValues, ", "));
             return null;
         } catch (IllegalAccessException | InvocationTargetException
                 | NoSuchMethodException | SecurityException e) {
@@ -1157,7 +1160,7 @@ public abstract class TiledReader {
     }
     
     private TiledObjectTypes readObjectTypes(String path, XMLStreamReader reader) throws XMLStreamException {
-        getAttributeValues(reader, Collections.emptyMap());
+        getAttributeValues(reader, Collections.<String,Boolean>emptyMap());
         Map<String,TiledObjectType> objectTypesMap = new HashMap<>();
         OUTER: while (true) {
             next(reader);
@@ -1235,7 +1238,7 @@ public abstract class TiledReader {
         String[] acceptableTypes = {"string", "int", "float", "bool", "color", "file"};
         if (Arrays.asList(acceptableTypes).indexOf(type) == -1) {
             throwInvalidValueException(reader, "type", type,
-                    "value must be one of the following: " + String.join(", ", acceptableTypes));
+                    "value must be one of the following: " + StringUtils.join(acceptableTypes, ", "));
         }
         
         String defaultStr = attributeValues.get("default");
@@ -1758,7 +1761,7 @@ public abstract class TiledReader {
     
     private List<TiledTerrainType> readTerrainTypes(XMLStreamReader reader, Map<Integer,TiledTile> idTiles)
             throws XMLStreamException {
-        getAttributeValues(reader, Collections.emptyMap());
+        getAttributeValues(reader, Collections.<String,Boolean>emptyMap());
         List<TiledTerrainType> terrainTypes = new ArrayList<>();
         OUTER: while (true) {
             next(reader);
@@ -1930,7 +1933,7 @@ public abstract class TiledReader {
     
     private List<AnimationFrame> readAnimation(XMLStreamReader reader, Map<Integer,TiledTile> idTiles)
             throws XMLStreamException {
-        getAttributeValues(reader, Collections.emptyMap());
+        getAttributeValues(reader, Collections.<String,Boolean>emptyMap());
         List<AnimationFrame> animation = new ArrayList<>();
         OUTER: while (true) {
             next(reader);
@@ -1975,7 +1978,7 @@ public abstract class TiledReader {
     
     private List<TiledWangSet> readWangSets(XMLStreamReader reader, Map<Integer,TiledTile> idTiles)
             throws XMLStreamException {
-        getAttributeValues(reader, Collections.emptyMap());
+        getAttributeValues(reader, Collections.<String,Boolean>emptyMap());
         List<TiledWangSet> wangSets = new ArrayList<>();
         OUTER: while (true) {
             next(reader);
@@ -2277,10 +2280,14 @@ public abstract class TiledReader {
             int k = 0;
             for (int j = 0; j < height; j++) {
                 for (int i = 0; i < width; i++) {
-                    data[i][j] = Byte.toUnsignedInt(bytes[k])
-                            + (Byte.toUnsignedInt(bytes[k + 1]) << 8)
-                            + (Byte.toUnsignedInt(bytes[k + 2]) << 16)
-                            + (Byte.toUnsignedInt(bytes[k + 3]) << 24);
+                    //data[i][j] = Byte.toUnsignedInt(bytes[k])
+                    //        + (Byte.toUnsignedInt(bytes[k + 1]) << 8)
+                    //        + (Byte.toUnsignedInt(bytes[k + 2]) << 16)
+                    //        + (Byte.toUnsignedInt(bytes[k + 3]) << 24);
+                    data[i][j] = (bytes[k] & 0xFF)
+                            + ((bytes[k + 1] & 0xFF) << 8)
+                            + ((bytes[k + 2] & 0xFF) << 16)
+                            + ((bytes[k + 3] & 0xFF) << 24);
                     k += 4;
                 }
             }
@@ -2296,7 +2303,7 @@ public abstract class TiledReader {
             for (int j = 0; j < height; j++) {
                 for (int i = 0; i < width; i++) {
                     try {
-                        data[i][j] = Integer.parseUnsignedInt(values[k].trim());
+                        data[i][j] = Integer.parseInt(values[k].trim());
                     } catch (NumberFormatException e) {
                         throw new XMLStreamException(describeReaderLocation(reader)
                                 + ": CSV-encoded embedded tile data contains a value (" + values[k]
@@ -2692,7 +2699,7 @@ public abstract class TiledReader {
         if (gidStr != null) {
             int rawGID;
             try {
-                rawGID = Integer.parseUnsignedInt(gidStr);
+                rawGID = Integer.parseInt(gidStr);
             } catch (NumberFormatException e) {
                 throw new XMLStreamException(describeReaderLocation(reader)
                         + ": <object> tag's gid attribute could not be parsed as an unsigned integer");
@@ -3064,7 +3071,7 @@ public abstract class TiledReader {
     private Map<String,Object> readProperties(String path, XMLStreamReader reader,
             Map<String,Object> existingProperties, Map<PropertyData,Integer> propertyObjectsToResolve)
             throws XMLStreamException {
-        getAttributeValues(reader, Collections.emptyMap());
+        getAttributeValues(reader, Collections.<String,Boolean>emptyMap());
         if (existingProperties == null) {
             existingProperties = new HashMap<>();
         }
@@ -3111,7 +3118,7 @@ public abstract class TiledReader {
         String[] acceptableTypes = {"string", "int", "float", "bool", "color", "file", "object"};
         if (Arrays.asList(acceptableTypes).indexOf(type) == -1) {
             throwInvalidValueException(reader, "type", type,
-                    "value must be one of the following: " + String.join(", ", acceptableTypes)
+                    "value must be one of the following: " + StringUtils.join(acceptableTypes, ", ")
                             + ", or attribute must be absent");
         }
         
@@ -3179,7 +3186,7 @@ public abstract class TiledReader {
     }
     
     private TiledObjectTemplate readTemplate(String path, XMLStreamReader reader) throws XMLStreamException {
-        getAttributeValues(reader, Collections.emptyMap());
+        getAttributeValues(reader, Collections.<String,Boolean>emptyMap());
         
         GlobalTileData tileData = new GlobalTileData();
         ObjectData data = null;

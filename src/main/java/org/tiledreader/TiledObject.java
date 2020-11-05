@@ -50,10 +50,10 @@ public class TiledObject implements TiledCustomizable {
         this.tileFlags = tileFlags;
         this.visible = visible;
         this.shape = shape;
-        this.points = (points == null ? Collections.emptyList() : Collections.unmodifiableList(points));
+        this.points = (points == null ? Collections.<Point2D>emptyList() : Collections.unmodifiableList(points));
         this.text = text;
         this.nonDefaultProperties = (nonDefaultProperties == null ?
-                Collections.emptyMap() : Collections.unmodifiableMap(nonDefaultProperties));
+                Collections.<String,Object>emptyMap() : Collections.unmodifiableMap(nonDefaultProperties));
         
         List<Map<String,Object>> propertyTiers = new ArrayList<>();
         if (!this.nonDefaultProperties.isEmpty()) {

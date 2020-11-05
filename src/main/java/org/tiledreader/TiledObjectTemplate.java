@@ -36,10 +36,10 @@ public class TiledObjectTemplate extends TiledResource implements TiledCustomiza
         this.tileFlags = tileFlags;
         this.visible = visible;
         this.shape = shape;
-        this.points = (points == null ? Collections.emptyList() : Collections.unmodifiableList(points));
+        this.points = (points == null ? Collections.<Point2D>emptyList() : Collections.unmodifiableList(points));
         this.text = text;
         this.properties = (properties == null ?
-                Collections.emptyMap() : Collections.unmodifiableMap(properties));
+                Collections.<String,Object>emptyMap() : Collections.unmodifiableMap(properties));
     }
     
     /**

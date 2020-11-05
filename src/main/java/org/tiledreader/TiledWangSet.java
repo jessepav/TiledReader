@@ -22,11 +22,11 @@ public class TiledWangSet {
         this.name = name;
         this.tile = tile;
         this.cornerColors = (cornerColors == null ?
-                Collections.emptyList() : Collections.unmodifiableList(cornerColors));
+                Collections.<TiledWangColor>emptyList() : Collections.unmodifiableList(cornerColors));
         this.edgeColors = (edgeColors == null ?
-                Collections.emptyList() : Collections.unmodifiableList(edgeColors));
+                Collections.<TiledWangColor>emptyList() : Collections.unmodifiableList(edgeColors));
         this.wangTiles = (wangTiles == null ?
-                Collections.emptyMap() : Collections.unmodifiableMap(wangTiles));
+                Collections.<TiledTile, TiledWangTile>emptyMap() : Collections.unmodifiableMap(wangTiles));
     }
     
     /**
