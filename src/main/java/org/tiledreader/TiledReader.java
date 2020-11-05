@@ -1,7 +1,5 @@
 package org.tiledreader;
 
-import org.apache.commons.lang3.StringUtils;
-
 import java.awt.Color;
 import java.awt.Point;
 import java.awt.geom.Point2D;
@@ -13,7 +11,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
-import org.apache.commons.codec.binary.Base64;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -28,6 +25,7 @@ import java.util.logging.Logger;
 import java.util.zip.DataFormatException;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.Inflater;
+import javax.xml.bind.DatatypeConverter;
 import javax.xml.stream.Location;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
@@ -389,8 +387,6 @@ public abstract class TiledReader {
     private static final int FL_TILE_FLIPY = 0x40000000;
     private static final int FL_TILE_FLIPD = 0x20000000;
     private static final int FL_TILE_ALL = FL_TILE_FLIPX | FL_TILE_FLIPY | FL_TILE_FLIPD;
-    
-    private static final Base64 BASE_64_DECODER = new Base64();
     
     /**
      * The logger for the TiledReader library.
@@ -1043,7 +1039,7 @@ public abstract class TiledReader {
                 throw new RuntimeException(e2);
             }
             throwInvalidValueException(reader, attribute, value,
-                    "value must be one of the following: " + StringUtils.join(enumValues, ", "));
+                "value must be one of the following: " + join(enumValues, ", "));
             return null;
         } catch (IllegalAccessException | InvocationTargetException
                 | NoSuchMethodException | SecurityException e) {
@@ -1238,7 +1234,7 @@ public abstract class TiledReader {
         String[] acceptableTypes = {"string", "int", "float", "bool", "color", "file"};
         if (Arrays.asList(acceptableTypes).indexOf(type) == -1) {
             throwInvalidValueException(reader, "type", type,
-                    "value must be one of the following: " + StringUtils.join(acceptableTypes, ", "));
+                "value must be one of the following: " + join(acceptableTypes, ", "));
         }
         
         String defaultStr = attributeValues.get("default");
@@ -2244,7 +2240,7 @@ public abstract class TiledReader {
         int[][] data = new int[width][height];
         if (encoding.equals("base64")) {
             int expectedDataSize = 4 * width * height;
-            byte[] bytes = BASE_64_DECODER.decode(dataStr);
+            byte[] bytes = DatatypeConverter.parseBase64Binary(dataStr);
             int dataSize = bytes.length;
             if (compression != null) {
                 switch (compression) {
@@ -3118,7 +3114,7 @@ public abstract class TiledReader {
         String[] acceptableTypes = {"string", "int", "float", "bool", "color", "file", "object"};
         if (Arrays.asList(acceptableTypes).indexOf(type) == -1) {
             throwInvalidValueException(reader, "type", type,
-                    "value must be one of the following: " + StringUtils.join(acceptableTypes, ", ")
+                    "value must be one of the following: " + join(acceptableTypes, ", ")
                             + ", or attribute must be absent");
         }
         
@@ -3230,6 +3226,17 @@ public abstract class TiledReader {
         return new TiledObjectTemplate(this, path,
                 data.name, data.type, data.width, data.height, data.rotation, data.tile, data.tileFlags,
                 data.visible, data.shape, data.points, data.text, data.nonDefaultProperties);
+    }
+
+    private String join(String[] arr, String separator) {
+        final int n = arr.length;
+        final StringBuilder sb = new StringBuilder(n * 16);
+        for (int i = 0; i < n; i++) {
+            if (i != 0)
+                sb.append(separator);
+            sb.append(arr[i]);
+        }
+        return sb.toString();
     }
     
 }

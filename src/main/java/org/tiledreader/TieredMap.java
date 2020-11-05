@@ -20,6 +20,7 @@ import java.util.Set;
  * @param <V> The type of mapped values
  * @author Alex Heyman
  */
+@SuppressWarnings("unchecked")
 public class TieredMap<K,V> implements Map<K,V> {
     
     private final List<Map<K,V>> tiers;
